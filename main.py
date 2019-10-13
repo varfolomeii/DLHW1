@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 import os
 from torchvision import datasets, models, transforms
+import time
 
 y_train = pd.read_csv('simple_image_classification/labels_trainval.csv')
 y_train = y_train.set_index('Id')
