@@ -141,4 +141,5 @@ for input, _ in dataloaders['mytest']:
 
 id = os.listdir(os.path.join(root_dir, 'test'))
 ans = pd.DataFrame({'Id': id, 'Category': predictions})
+ans = ans.set_index('Id')
 ans.to_csv('labels_test.csv')
