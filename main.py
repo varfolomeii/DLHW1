@@ -135,7 +135,7 @@ model_ft = train_model(
 
 predictions = []
 for input, _ in dataloaders['mytest']:
-  outputs = model_ft(input)
+  outputs = model_ft(input.cuda())
   _, preds = torch.max(outputs, -1)
   for pred in preds:
     predictions.append("{0:0>4}".format(pred.item()))
