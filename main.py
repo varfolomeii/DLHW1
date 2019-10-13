@@ -46,7 +46,7 @@ data_transforms = {
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val', 'mytest']}
 
 resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
@@ -131,10 +131,13 @@ exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, ga
 model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
 
+predictions = []
+for data in dataloaders['mytest']:
+  outputs = model_ft(data.input)
+  _, preds = torch.max(outputs, -1)
+  predictions.extend(preds)
 
-outputs = model_ft(image_datasets['mytest'])
-_, preds = torch.max(outputs, -1)
 
 id = os.listdir(os.path.join(root_dir, 'test'))
-ans = pd.DataFrame({'Id': id, 'Category': preds})
+ans = pd.DataFrame({'Id': id, 'Category': predictions})
 ans.to_csv('labels_test.csv')
