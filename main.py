@@ -51,6 +51,7 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, n
 resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
 use_gpu = torch.cuda.is_available()
+dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
 def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=25):
   since = time.time()
