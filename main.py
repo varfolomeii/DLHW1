@@ -21,8 +21,8 @@ for image in os.listdir(os.path.join(root_dir, 'trainval'))[90000:]:
     copyfile('{}/{}'.format(os.path.join(root_dir, 'trainval'), image),
              '{}/{}/{}'.format(os.path.join(root_dir, 'val'), y_train.loc[image]['Category'], image))
 for image in os.listdir(os.path.join(root_dir, 'test')):
-  copyfile('{}/{}'.format(os.path.join(root_dir, 'trainval'), image),
-            '{}/{}/'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
+  copyfile('{}/{}'.format(os.path.join(root_dir, 'test'), image),
+            '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(224),
