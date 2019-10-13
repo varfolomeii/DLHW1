@@ -9,6 +9,8 @@ y_train = y_train.set_index('Id')
 root_dir = 'simple_image_classification'
 os.mkdir(os.path.join(root_dir, 'train'))
 os.mkdir(os.path.join(root_dir, 'val'))
+os.mkdir(os.path.join(root_dir, 'mytest'))
+os.mkdir(os.path.join(root_dir, 'mytest', 'sub'))
 for i in range(200):
     os.mkdir(os.path.join(root_dir, 'train', str(i)))
     os.mkdir(os.path.join(root_dir, 'val', str(i)))
@@ -18,6 +20,9 @@ for image in os.listdir(os.path.join(root_dir, 'trainval'))[:90000]:
 for image in os.listdir(os.path.join(root_dir, 'trainval'))[90000:]:
     copyfile('{}/{}'.format(os.path.join(root_dir, 'trainval'), image),
              '{}/{}/{}'.format(os.path.join(root_dir, 'val'), y_train.loc[image]['Category'], image))
+for image in os.listdir(os.path.join(root_dir, 'test')):
+  copyfile('{}/{}'.format(os.path.join(root_dir, 'trainval'), image),
+            '{}/{}/'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomResizedCrop(224),
@@ -39,7 +44,7 @@ data_transforms = {
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
-                                          data_transforms[x]) for x in ['train', 'val', 'test']}
+                                          data_transforms[x]) for x in ['train', 'val', 'mytest']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
 
 resnet = models.resnet18()
@@ -125,7 +130,7 @@ model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
 
 
-outputs = model_ft(image_datasets['test'])
+outputs = model_ft(image_datasets['mytest'])
 _, preds = torch.max(outputs, -1)
 
 id = os.listdir(os.path.join(root_dir, 'test'))
