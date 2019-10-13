@@ -132,8 +132,8 @@ model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
 
 predictions = []
-for data in dataloaders['mytest']:
-  outputs = model_ft(data.input)
+for input, _ in dataloaders['mytest']:
+  outputs = model_ft(input)
   _, preds = torch.max(outputs, -1)
   predictions.extend(preds)
 
