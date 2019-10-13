@@ -135,7 +135,8 @@ predictions = []
 for input, _ in dataloaders['mytest']:
   outputs = model_ft(input)
   _, preds = torch.max(outputs, -1)
-  predictions.extend(preds)
+  for pred in preds:
+    predictions.append("{0:0>4}".format(pred.item()))
 
 
 id = os.listdir(os.path.join(root_dir, 'test'))
