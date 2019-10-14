@@ -46,8 +46,12 @@ data_transforms = {
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val', 'mytest']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
+dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=False)
 
+test_ids = []
+for name, _ in image_datasets['mytest'].imgs:
+    test_ids.append(name.split('/')[-1])
 resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
 use_gpu = torch.cuda.is_available()
@@ -141,7 +145,6 @@ for input, _ in dataloaders['mytest']:
     predictions.append("{0:0>4}".format(pred.item()))
 
 
-id = os.listdir(os.path.join(root_dir, 'test'))
-ans = pd.DataFrame({'Id': id, 'Category': predictions})
+ans = pd.DataFrame({'Id': test_ids, 'Category': predictions})
 ans = ans.set_index('Id')
 ans.to_csv('labels_test.csv')
