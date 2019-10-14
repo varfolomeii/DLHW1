@@ -132,7 +132,7 @@ model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
 
 predictions = []
-count = 1
+count = 0
 batch = []
 test_ids = [path.split('/'[-1] for path, _ in image_datasets['mytest'].imgs)]
 for input, _ in image_datasets['mytest']:
@@ -141,11 +141,16 @@ for input, _ in image_datasets['mytest']:
     _, preds = torch.max(outputs, -1)
     for pred in preds:
         predictions.append("{0:0>4}".format(pred.item()))
-    batch = []
+    batch = [input[0]]
+    count = 1
   else:
     count += 1
     batch.append(input[0])
 
+outputs = model_ft(torch.tensor(batch).cuda())
+    _, preds = torch.max(outputs, -1)
+for pred in preds:
+    predictions.append("{0:0>4}".format(pred.item()))
 
 ans = pd.DataFrame({'Id': test_ids, 'Category': predictions})
 ans = ans.set_index('Id')
