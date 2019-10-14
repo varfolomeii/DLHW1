@@ -129,8 +129,10 @@ optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.9)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
-    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
+    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=20)
 
+torch.save(model_ft.state_dict(), 'my_model')
+model_ft.eval()
 predictions = []
 count = 0
 batch = []
