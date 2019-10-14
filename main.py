@@ -46,13 +46,11 @@ data_transforms = {
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
-                                          data_transforms[x]) for x in ['train', 'val', 'mytest']}
+                                          data_transforms[x], return_paths=True) for x in ['train', 'val', 'mytest'],}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 
-test_ids = []
-for name, _ in image_datasets['mytest'].imgs:
-    test_ids.append(name.split('/')[-1])
+
 resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
 use_gpu = torch.cuda.is_available()
@@ -139,11 +137,20 @@ model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=5)
 
 predictions = []
-for input, _ in image_datasets['mytest']
-  outputs = model_ft(input.cuda())
-  _, preds = torch.max(outputs, -1)
-  for pred in preds:
-    predictions.append("{0:0>4}".format(pred.item()))
+count = 1
+batch = []
+test_ids = []
+for input, path in image_datasets['mytest']:
+  if count % 4 == 0:
+    outputs = model_ft(torch.tensor(batch).cuda())
+    _, preds = torch.max(outputs, -1)
+    for pred in preds:
+        predictions.append("{0:0>4}".format(pred.item()))
+    batch = []
+  else:
+    count += 1
+    batch.append(input[0])
+  test_ids.append(path.split('/')[-1])
 
 
 ans = pd.DataFrame({'Id': test_ids, 'Category': predictions})
