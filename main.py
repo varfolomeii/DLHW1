@@ -134,8 +134,8 @@ model_ft = train_model(
 predictions = []
 count = 1
 batch = []
-test_ids = []
-for input, path in image_datasets['mytest']:
+test_ids = [path.split('/'[-1] for path, _ in image_datasets['mytest'].imgs)]
+for input, _ in image_datasets['mytest']:
   if count % 4 == 0:
     outputs = model_ft(torch.tensor(batch).cuda())
     _, preds = torch.max(outputs, -1)
@@ -145,7 +145,6 @@ for input, path in image_datasets['mytest']:
   else:
     count += 1
     batch.append(input[0])
-  test_ids.append(path.split('/')[-1])
 
 
 ans = pd.DataFrame({'Id': test_ids, 'Category': predictions})
