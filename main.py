@@ -47,7 +47,7 @@ data_transforms = {
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
-dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=False)
+dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 
 test_ids = []
 for name, _ in image_datasets['mytest'].imgs:
@@ -135,7 +135,7 @@ optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.9)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
-    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=20)
+    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=5)
 
 predictions = []
 for input, _ in dataloaders['mytest']:
