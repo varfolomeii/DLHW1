@@ -27,26 +27,21 @@ for image in os.listdir(os.path.join(root_dir, 'test')):
             '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
-        transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'val': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'mytest': transforms.Compose([
-        transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
-                                          data_transforms[x], return_paths=True) for x in ['train', 'val', 'mytest'],}
+                                          data_transforms[x]) for x in ['train', 'val', 'mytest']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 
@@ -134,7 +129,7 @@ optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.9)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
-    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=5)
+    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=1)
 
 predictions = []
 count = 1
