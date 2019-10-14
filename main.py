@@ -148,7 +148,7 @@ for input, _ in image_datasets['mytest']:
     batch.append(input[0])
 
 outputs = model_ft(torch.tensor(batch).cuda())
-    _, preds = torch.max(outputs, -1)
+_, preds = torch.max(outputs, -1)
 for pred in preds:
     predictions.append("{0:0>4}".format(pred.item()))
 
