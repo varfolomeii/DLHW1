@@ -12,6 +12,7 @@ os.mkdir(os.path.join(root_dir, 'train'))
 os.mkdir(os.path.join(root_dir, 'val'))
 os.mkdir(os.path.join(root_dir, 'mytest'))
 os.mkdir(os.path.join(root_dir, 'mytest', 'sub'))
+torch.manual_seed(42)
 for i in range(200):
     os.mkdir(os.path.join(root_dir, 'train', str(i)))
     os.mkdir(os.path.join(root_dir, 'val', str(i)))
@@ -138,7 +139,7 @@ model_ft = train_model(
     resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=5)
 
 predictions = []
-for input, _ in dataloaders['mytest']:
+for input, _ in image_datasets['mytest']
   outputs = model_ft(input.cuda())
   _, preds = torch.max(outputs, -1)
   for pred in preds:
