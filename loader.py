@@ -32,7 +32,7 @@ class_names = image_datasets['train'].classes
 resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
 resnet.load_state_dict(torch.load('my_model'))
-model_ft = resnet
+model_ft = resnet.cuda()
 model_ft.eval()
 
 predictions = []
