@@ -46,6 +46,7 @@ image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
+class_names = image_datasets['train'].classes
 
 
 resnet = models.resnet18()
@@ -144,7 +145,7 @@ for input, _ in image_datasets['mytest']:
     outputs = model_ft(torch.stack(batch).cuda())
     _, preds = torch.max(outputs, -1)
     for pred in preds:
-        predictions.append("{0:0>4}".format(pred.item()))
+        predictions.append("{0:0>4}".format(class_names[pred]))
     batch = [input]
     count = 1
   else:
@@ -154,7 +155,7 @@ for input, _ in image_datasets['mytest']:
 outputs = model_ft(torch.stack(batch).cuda())
 _, preds = torch.max(outputs, -1)
 for pred in preds:
-    predictions.append("{0:0>4}".format(pred.item()))
+    predictions.append("{0:0>4}".format(class_names[pred]))
 
 ans = pd.DataFrame({'Id': test_ids, 'Category': predictions})
 ans = ans.set_index('Id')
