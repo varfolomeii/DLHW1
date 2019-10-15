@@ -29,7 +29,10 @@ image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
 
 class_names = image_datasets['train'].classes
 
-model_ft = torch.load('my_model')
+resnet = models.resnet18()
+resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
+resnet.load_state_dict(torch.load('my_model'))
+model_ft = resnet
 model_ft.eval()
 
 predictions = []
