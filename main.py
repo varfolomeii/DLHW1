@@ -60,7 +60,7 @@ model_ft.classifier = torch.nn.Sequential(
 )
 use_gpu = torch.cuda.is_available()
 if use_gpu:
-    resnet = resnet.cuda()
+    model_ft = model_ft.cuda()
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
 def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=25):
