@@ -137,7 +137,7 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=
 
 params_to_train = model_ft.parameters()
 criterion = torch.nn.CrossEntropyLoss()
-optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.9)
+optimizer_ft = torch.optim.SGD(params_to_train, lr=0.01, momentum=0.9)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
