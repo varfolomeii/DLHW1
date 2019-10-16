@@ -25,8 +25,8 @@ for image in os.listdir(os.path.join(root_dir, 'trainval'))[90000:]:
     copyfile('{}/{}'.format(os.path.join(root_dir, 'trainval'), image),
              '{}/{}/{}'.format(os.path.join(root_dir, 'val'), y_train.loc[image]['Category'], image))
 for image in os.listdir(os.path.join(root_dir, 'test')):
-  copyfile('{}/{}'.format(os.path.join(root_dir, 'test'), image),
-            '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
+    copyfile('{}/{}'.format(os.path.join(root_dir, 'test'), image),
+             '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomHorizontalFlip(),
@@ -44,95 +44,98 @@ data_transforms = {
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=50, num_workers=4, shuffle=True) for x in ['train', 'val']}
-dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=50, num_workers=4, shuffle=True) for x in
+               ['train', 'val']}
+dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4,
+                                                    shuffle=False)
 class_names = image_datasets['train'].classes
-
 
 model_ft = torch.hub.load('pytorch/vision', 'mobilenet_v2')
 model_ft.classifier = torch.nn.Sequential(
-  torch.nn.Dropout(p=0.2, inplace=False),
-  torch.nn.Linear(1280, 200, bias=True)
+    torch.nn.Dropout(p=0.2, inplace=False),
+    torch.nn.Linear(1280, 200, bias=True)
 )
 use_gpu = torch.cuda.is_available()
 if use_gpu:
     model_ft = model_ft.cuda()
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
+
 def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=25):
-  since = time.time()
+    since = time.time()
 
-  best_model_wts = model.state_dict()
-  best_acc = 0.0
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
 
-  for epoch in range(num_epochs):
-    print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-    print('-' * 10)
+    for epoch in range(num_epochs):
+        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
 
-    # Each epoch has a training and validation phase
-    for phase in ['train', 'val']:
-      if phase == 'train':
-        scheduler.step()
-        model.train(True)  # Set model to training mode
-      else:
-        model.train(False)  # Set model to evaluate mode
+        # Each epoch has a training and validation phase
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                scheduler.step()
+                model.train(True)  # Set model to training mode
+            else:
+                model.train(False)  # Set model to evaluate mode
 
-      running_loss = 0.0
-      running_corrects = 0
+            running_loss = 0.0
+            running_corrects = 0
 
-      # Iterate over data.
-      for data in dataloaders[phase]:
-        # get the inputs
-        inputs, labels = data
+            # Iterate over data.
+            for data in dataloaders[phase]:
+                # get the inputs
+                inputs, labels = data
 
-        if use_gpu:
-          inputs = inputs.cuda()
-          labels = labels.cuda()
+                if use_gpu:
+                    inputs = inputs.cuda()
+                    labels = labels.cuda()
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
+                # zero the parameter gradients
+                optimizer.zero_grad()
 
-        # forward
-        outputs = model(inputs)
-        _, preds = torch.max(outputs, 1)
-        loss = criterion(outputs, labels)
+                # forward
+                outputs = model(inputs)
+                _, preds = torch.max(outputs, 1)
+                loss = criterion(outputs, labels)
 
-        # backward + optimize only if in training phase
-        if phase == 'train':
-          loss.backward()
-          optimizer.step()
+                # backward + optimize only if in training phase
+                if phase == 'train':
+                    loss.backward()
+                    optimizer.step()
 
-        # statistics
-        running_loss += loss.item()
-        running_corrects += torch.sum(preds == labels).type(torch.float)
+                # statistics
+                running_loss += loss.item()
+                running_corrects += torch.sum(preds == labels).type(torch.float)
 
-      epoch_loss = running_loss / dataset_sizes[phase]
-      epoch_acc = running_corrects / dataset_sizes[phase]
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects / dataset_sizes[phase]
 
-      print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-        phase, epoch_loss, epoch_acc))
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
+                phase, epoch_loss, epoch_acc))
 
-      # deep copy the model
-      if phase == 'val' and epoch_acc > best_acc:
-        best_acc = epoch_acc
-        best_model_wts = model.state_dict()
+            # deep copy the model
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = model.state_dict()
+
+        time_elapsed = time.time() - since
+        print('Elapsed {:.0f}m {:.0f}s\n'.format(time_elapsed // 60, time_elapsed % 60))
 
     time_elapsed = time.time() - since
-    print('Elapsed {:.0f}m {:.0f}s\n'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Training complete in {:.0f}m {:.0f}s'.format(
+        time_elapsed // 60, time_elapsed % 60))
+    print('Best val Acc: {:4f}'.format(best_acc))
 
-  time_elapsed = time.time() - since
-  print('Training complete in {:.0f}m {:.0f}s'.format(
-    time_elapsed // 60, time_elapsed % 60))
-  print('Best val Acc: {:4f}'.format(best_acc))
+    # load best model weights
+    model.load_state_dict(best_model_wts)
+    return model
 
-  # load best model weights
-  model.load_state_dict(best_model_wts)
-  return model
 
 params_to_train = model_ft.parameters()
 criterion = torch.nn.CrossEntropyLoss()
-optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.95)
-exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
+optimizer_ft = torch.optim.Adam(params_to_train, lr=0.1)
+exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=5, gamma=0.1)
 
 model_ft = train_model(
     model_ft, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=20)
@@ -144,16 +147,16 @@ count = 0
 batch = []
 test_ids = [path[0].split('/')[-1] for path in image_datasets['mytest'].imgs]
 for input, _ in image_datasets['mytest']:
-  if count > 0 and count % 50 == 0:
-    outputs = model_ft(torch.stack(batch).cuda())
-    _, preds = torch.max(outputs, -1)
-    for pred in preds:
-        predictions.append("{0:0>4}".format(class_names[pred]))
-    batch = [input]
-    count = 1
-  else:
-    count += 1
-    batch.append(input)
+    if count > 0 and count % 50 == 0:
+        outputs = model_ft(torch.stack(batch).cuda())
+        _, preds = torch.max(outputs, -1)
+        for pred in preds:
+            predictions.append("{0:0>4}".format(class_names[pred]))
+        batch = [input]
+        count = 1
+    else:
+        count += 1
+        batch.append(input)
 
 outputs = model_ft(torch.stack(batch).cuda())
 _, preds = torch.max(outputs, -1)
