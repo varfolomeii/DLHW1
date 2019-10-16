@@ -148,7 +148,7 @@ count = 0
 batch = []
 test_ids = [path[0].split('/')[-1] for path in image_datasets['mytest'].imgs]
 for input, _ in image_datasets['mytest']:
-  if count > 0 and count % 20 == 0:
+  if count > 0 and count % 40 == 0:
     outputs = model_ft(torch.stack(batch).cuda())
     _, preds = torch.max(outputs, -1)
     for pred in preds:
