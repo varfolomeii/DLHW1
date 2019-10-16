@@ -27,22 +27,22 @@ for image in os.listdir(os.path.join(root_dir, 'test')):
             '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
+        transforms.Grayscale(),
+        transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(30),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'val': transforms.Compose([
+        transforms.Grayscale(),
+        transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(30),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'mytest': transforms.Compose([
+        transforms.Grayscale(),
+        transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(30),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
@@ -52,7 +52,7 @@ dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], ba
 class_names = image_datasets['train'].classes
 
 
-resnet = models.resnet50()
+resnet = models.resnet18()
 resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
 use_gpu = torch.cuda.is_available()
 if use_gpu:
