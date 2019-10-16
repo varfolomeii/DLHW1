@@ -31,26 +31,23 @@ data_transforms = {
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        transforms.RandomErasing(),
     ]),
     'val': transforms.Compose([
         transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        transforms.RandomErasing(),
     ]),
     'mytest': transforms.Compose([
         transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-        transforms.RandomErasing(),
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4, num_workers=4, shuffle=True) for x in ['train', 'val']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=20, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 class_names = image_datasets['train'].classes
 
@@ -134,7 +131,7 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=
 
 params_to_train = resnet.parameters()
 criterion = torch.nn.CrossEntropyLoss()
-optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.9)
+optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.95)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
@@ -147,7 +144,7 @@ count = 0
 batch = []
 test_ids = [path[0].split('/')[-1] for path in image_datasets['mytest'].imgs]
 for input, _ in image_datasets['mytest']:
-  if count > 0 and count % 4 == 0:
+  if count > 0 and count % 20 == 0:
     outputs = model_ft(torch.stack(batch).cuda())
     _, preds = torch.max(outputs, -1)
     for pred in preds:
