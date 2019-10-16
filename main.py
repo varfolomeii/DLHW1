@@ -31,20 +31,21 @@ data_transforms = {
     'train': transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
     'val': transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
     'mytest': transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=200, num_workers=4, shuffle=True) for x in ['train', 'val']}
+print(image_datasets['train'].mean(dim=1))
+print(image_datasets['train'].std(dim=1))
+image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
+                                          data_transforms[x]) for x in ['train', 'val', 'mytest']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=100, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 class_names = image_datasets['train'].classes
 
@@ -144,7 +145,7 @@ count = 0
 batch = []
 test_ids = [path[0].split('/')[-1] for path in image_datasets['mytest'].imgs]
 for input, _ in image_datasets['mytest']:
-  if count > 0 and count % 200 == 0:
+  if count > 0 and count % 100 == 0:
     outputs = model_ft(torch.stack(batch).cuda())
     _, preds = torch.max(outputs, -1)
     for pred in preds:
