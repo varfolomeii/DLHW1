@@ -27,22 +27,25 @@ for image in os.listdir(os.path.join(root_dir, 'test')):
             '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
-        transforms.Grayscale(),
         transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        transforms.RandomErasing(),
     ]),
     'val': transforms.Compose([
-        transforms.Grayscale(),
         transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        transforms.RandomErasing(),
     ]),
     'mytest': transforms.Compose([
-        transforms.Grayscale(),
         transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        transforms.RandomErasing(),
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
