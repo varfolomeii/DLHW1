@@ -13,6 +13,8 @@ os.mkdir(os.path.join(root_dir, 'val'))
 os.mkdir(os.path.join(root_dir, 'mytest'))
 os.mkdir(os.path.join(root_dir, 'mytest', 'sub'))
 torch.manual_seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
 for i in range(200):
     os.mkdir(os.path.join(root_dir, 'train', str(i)))
     os.mkdir(os.path.join(root_dir, 'val', str(i)))
@@ -27,28 +29,22 @@ for image in os.listdir(os.path.join(root_dir, 'test')):
             '{}/{}'.format(os.path.join(root_dir, 'mytest', 'sub'), image))
 data_transforms = {
     'train': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
     'val': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
     'mytest': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
     ]),
 }
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=40, num_workers=4, shuffle=True) for x in ['train', 'val']}
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=200, num_workers=4, shuffle=True) for x in ['train', 'val']}
 dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], batch_size=4, num_workers=4, shuffle=False)
 class_names = image_datasets['train'].classes
 
@@ -148,7 +144,7 @@ count = 0
 batch = []
 test_ids = [path[0].split('/')[-1] for path in image_datasets['mytest'].imgs]
 for input, _ in image_datasets['mytest']:
-  if count > 0 and count % 40 == 0:
+  if count > 0 and count % 200 == 0:
     outputs = model_ft(torch.stack(batch).cuda())
     _, preds = torch.max(outputs, -1)
     for pred in preds:
