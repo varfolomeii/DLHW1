@@ -53,8 +53,11 @@ dataloaders['mytest'] = torch.utils.data.DataLoader(image_datasets['mytest'], ba
 class_names = image_datasets['train'].classes
 
 
-resnet = torch.hub.load('pytorch/vision', 'mobilenet_v2')
-resnet.fc = torch.nn.Linear(resnet.fc.in_features, 200)
+model_ft = torch.hub.load('pytorch/vision', 'mobilenet_v2')
+model_ft.classifier = torch.nn.Sequential(
+  torch.nn.Dropout(p=0.2, inplace=False),
+  torch.nn.Linear(1280, 200, bias=True)
+)
 use_gpu = torch.cuda.is_available()
 if use_gpu:
     resnet = resnet.cuda()
@@ -130,13 +133,13 @@ def train_model(model, criterion, optimizer, scheduler, dataloaders, num_epochs=
   model.load_state_dict(best_model_wts)
   return model
 
-params_to_train = resnet.parameters()
+params_to_train = model_ft.parameters()
 criterion = torch.nn.CrossEntropyLoss()
 optimizer_ft = torch.optim.SGD(params_to_train, lr=0.001, momentum=0.95)
 exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(
-    resnet, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=20)
+    model_ft, criterion, optimizer_ft, exp_lr_scheduler, dataloaders, num_epochs=20)
 
 torch.save(model_ft.state_dict(), 'my_model')
 model_ft.eval()
