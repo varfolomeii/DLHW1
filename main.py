@@ -31,18 +31,17 @@ data_transforms = {
     'train': transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
+        transforms.Normalize([0.3116, 0.2755, 0.2894], [0.1974, 0.1741, 0.1702]),
     ]),
     'val': transforms.Compose([
         transforms.ToTensor(),
+        transforms.Normalize([0.3116, 0.2755, 0.2894], [0.1974, 0.1741, 0.1702]),
     ]),
     'mytest': transforms.Compose([
         transforms.ToTensor(),
+        transforms.Normalize([0.3116, 0.2755, 0.2894], [0.1974, 0.1741, 0.1702]),
     ]),
 }
-image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
-                                          data_transforms[x]) for x in ['train', 'val', 'mytest']}
-print(image_datasets['train'].mean(dim=1))
-print(image_datasets['train'].std(dim=1))
 image_datasets = {x: datasets.ImageFolder(os.path.join(root_dir, x),
                                           data_transforms[x]) for x in ['train', 'val', 'mytest']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=100, num_workers=4, shuffle=True) for x in ['train', 'val']}
